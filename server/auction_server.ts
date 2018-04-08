@@ -23,14 +23,54 @@ const products:Product[] = [
       new Product(6,"第6个商品",6.99,4.5,"这是第6个商品",["图书"]),
       ];
 
-app.get('/', (req,res) =>{
-    res.send("hello express");
-})
+export class Comment {
+  constructor(public id:number,
+        public productId:number,
+        public timestamp:string,
+        public user:string,
+        public rating:number,
+        public content:string
+    ){
 
-app.get('/products', (req,res) =>{
+  }
+}
+
+const comments:Comment[] = [
+         new Comment(1,1,"2018-02-02 22:22:22","张三",3,"东西不错"),
+         new Comment(2,1,"2018-01-02 16:22:22","张三",4,"东西挺不错"),
+         new Comment(3,1,"2018-03-02 21:22:22","张三",2,"东西还不错"),
+         new Comment(4,2,"2018-04-02 23:22:22","张三",4,"东西非常不错")
+   ]
+
+app.get('/api', (req,res) =>{
+    res.send("hello express");
+});
+
+app.get('/api/products', (req,res) =>{
+    let result = products;
+    let params = req.query;
+    if(params.title){
+      result = result.filter((p) => p.title.indexOf(params.title) !== -1);
+    }
+
+    if(params.price && result.length > 0){
+      result = result.filter((p) => p.price <= parseInt(params.price));
+    }
+
+    if(params.category && result.length > 0){
+      result = result.filter((p) => p.categories.indexOf(params.category) !== -1);
+    }
     res.json(products);
-})
+});
+
+app.get('/api/product/:id', (req,res) =>{
+    res.json(products.find( (product) => product.id == req.params.id ));
+});
+
+app.get('/api/product/:id/comments', (req,res) =>{
+    res.json(comments.filter((comment: Comment)=> comment.productId == req.params.id));
+});
 
 const server = app.listen(8000, "localhost", () =>{
     console.log("服务器已启动，地址是：http://localhost:8000");
-})
+});
