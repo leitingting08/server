@@ -67,15 +67,33 @@ app.get('/api/product/:id/comments', function (req, res) {
 var server = app.listen(8000, "localhost", function () {
     console.log("服务器已启动，地址是：http://localhost:8000");
 });
+var subscriptions = new Map();
 var wsServer = new ws_1.Server({ port: 8085 });
 wsServer.on("connection", function (websocket) {
     websocket.send('这是服务器主动推送的消息');
-    websocket.on('message', function (message) { console.log("接收到消息:" + message); });
+    websocket.on('message', function (message) {
+        var messageObj = JSON.stringify(message);
+        var productIds = subscriptions.get(websocket) || [];
+        // subscriptions.set(websocket, [...productIds, messageObj.productId]);
+    });
 });
+var currentBids = new Map();
 setInterval(function () {
-    if (wsServer.clients) {
-        wsServer.clients.forEach(function (client) {
-            client.send('这是定时推送');
-        });
-    }
+    products.forEach(function (p) {
+        var currentBid = currentBids.get(p.id) || p.price;
+        var newBid = currentBid + Math.random() * 5;
+        currentBids.set(p.id, newBid);
+    });
+    subscriptions.forEach(function (productIds, ws) {
+        if (ws.readyState === 1) {
+            var newBids = productIds.map(function (pid) { return ({
+                productId: pid,
+                bid: currentBids.get(pid)
+            }); });
+            ws.send(JSON.stringify(newBids));
+        }
+        else {
+            subscriptions.delete(ws);
+        }
+    });
 }, 2000);
