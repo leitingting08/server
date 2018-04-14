@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
+var ws_1 = require("ws");
 var app = express();
 var Product = /** @class */ (function () {
     function Product(id, title, price, star, desc, categories) {
@@ -66,3 +67,15 @@ app.get('/api/product/:id/comments', function (req, res) {
 var server = app.listen(8000, "localhost", function () {
     console.log("服务器已启动，地址是：http://localhost:8000");
 });
+var wsServer = new ws_1.Server({ port: 8085 });
+wsServer.on("connection", function (websocket) {
+    websocket.send('这是服务器主动推送的消息');
+    websocket.on('message', function (message) { console.log("接收到消息:" + message); });
+});
+setInterval(function () {
+    if (wsServer.clients) {
+        wsServer.clients.forEach(function (client) {
+            client.send('这是定时推送');
+        });
+    }
+}, 2000);
