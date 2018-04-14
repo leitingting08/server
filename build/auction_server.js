@@ -44,7 +44,18 @@ app.get('/api', function (req, res) {
     res.send("hello express");
 });
 app.get('/api/products', function (req, res) {
-    res.json(products);
+    var result = products;
+    var params = req.query;
+    if (params.title) {
+        result = result.filter(function (p) { return p.title.indexOf(params.title) !== -1; });
+    }
+    if (params.price && result.length > 0) {
+        result = result.filter(function (p) { return p.price <= parseInt(params.price); });
+    }
+    if (params.category && params.category !== "-1" && result.length > 0) {
+        result = result.filter(function (p) { return p.categories.indexOf(params.category) !== -1; });
+    }
+    res.json(result);
 });
 app.get('/api/product/:id', function (req, res) {
     res.json(products.find(function (product) { return product.id == req.params.id; }));
