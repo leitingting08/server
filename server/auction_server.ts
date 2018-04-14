@@ -79,7 +79,9 @@ const server = app.listen(8000, "localhost", () =>{
 const wsServer = new Server({port: 8085});
 wsServer.on("connection", websocket => {
   websocket.send('这是服务器主动推送的消息');
-  websocket.on('message', message => {console.log("接收到消息:"+ message)});
+  websocket.on('message', message => {
+    });
+  }
 });
 
 setInterval(() => {
