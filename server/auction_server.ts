@@ -82,9 +82,9 @@ const wsServer = new Server({port: 8085});
 wsServer.on("connection", websocket => {
   websocket.send('这是服务器主动推送的消息');
   websocket.on('message', message => {
-    let messageObj = JSON.stringify(message);
+    let messageObj = JSON.parse(JSON.stringify(message));
     let productIds = subscriptions.get(websocket) || [];
-    // subscriptions.set(websocket, [...productIds, messageObj.productId]);
+    subscriptions.set(websocket, [...productIds, messageObj.productId]);
     });
 });
 

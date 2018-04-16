@@ -72,9 +72,9 @@ var wsServer = new ws_1.Server({ port: 8085 });
 wsServer.on("connection", function (websocket) {
     websocket.send('这是服务器主动推送的消息');
     websocket.on('message', function (message) {
-        var messageObj = JSON.stringify(message);
+        var messageObj = JSON.parse(JSON.stringify(message));
         var productIds = subscriptions.get(websocket) || [];
-        // subscriptions.set(websocket, [...productIds, messageObj.productId]);
+        subscriptions.set(websocket, productIds.concat([messageObj.productId]));
     });
 });
 var currentBids = new Map();
