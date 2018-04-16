@@ -1,7 +1,11 @@
 import * as express from 'express';
+import * as path from 'path';
 import { Server } from 'ws';
 
 const app = express();
+
+app.use('/',express.static(path.join(__dirname,'..','client')))
+
 export class Product{
     constructor(
         public id:number,
@@ -105,6 +109,6 @@ setInterval(() => {
       ws.send(JSON.stringify(newBids));
     }else{
       subscriptions.delete(ws);
-    }  
+    }
   });
 }, 2000);

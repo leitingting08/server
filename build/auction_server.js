@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
+var path = require("path");
 var ws_1 = require("ws");
 var app = express();
+app.use('/', express.static(path.join(__dirname, '..', 'client')));
 var Product = /** @class */ (function () {
     function Product(id, title, price, star, desc, categories) {
         this.id = id;
